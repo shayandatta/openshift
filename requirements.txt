@@ -1,4 +1,3 @@
 Flask==0.11
 gunicorn==19.1.0
 nsetools
-json==2.0.9
