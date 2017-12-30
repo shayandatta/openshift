@@ -2,3 +2,4 @@ Flask==0.11
 gunicorn==19.1.0
 nsetools
 python-dateutil
+python-firebase
