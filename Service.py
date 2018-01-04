@@ -96,7 +96,7 @@ def addUser(key):
     data = request.data
     if data is not None:
         try:
-            dataDict = json.loads(data)
+            dataDict = json.loads(data.decode('utf-8'))
             return manager.AddUser(key,dataDict['firebaseurl'],dataDict['firebasepwd'])
         except Exception as e:
             raise InvalidUsage('data send is not in correct format :'+str(e), status_code=400)
@@ -110,7 +110,7 @@ def addConditionFieldList(key):
     data = request.data
     if data and userid is not None:
         try:
-            dataDict = json.loads(data)
+            dataDict = json.loads(data.decode('utf-8'))
             return manager.AddConditionFieldList(key,userid,dataDict['indice'],dataDict['attrnames'],dataDict['attrtypes'],dataDict['attrvalues'],dataDict['conjunctions'],dataDict['operations'],dataDict['triggermessage'])
         except:
             raise InvalidUsage('data send is not in correct format', status_code=400)
@@ -125,7 +125,7 @@ def addSubscibeFieldList(key):
     data = request.data
     if data and userid is not None:
         try:
-            dataDict = json.loads(data)
+            dataDict = json.loads(data.decode('utf-8'))
             return manager.AddSubscibeFieldList(key,userid,dataDict['indice'],dataDict['subscribefldlist'])
         except:
             raise InvalidUsage('data send is not in correct format', status_code=400)
@@ -140,7 +140,7 @@ def delConditionFieldList(key):
     data = request.data
     if data and userid is not None:
         try:
-            dataDict = json.loads(data)
+            dataDict = json.loads(data.decode('utf-8'))
             return manager.RemoveFromConditionList(key,userid,dataDict['id'])
         except:
             raise InvalidUsage('data send is not in correct format', status_code=400)
@@ -155,7 +155,7 @@ def delSubscibeFieldList(key):
     data = request.data
     if data and userid is not None:
         try:
-            dataDict = json.loads(data)
+            dataDict = json.loads(data.decode('utf-8'))
             return manager.RemoveFromSubscriptionList(key,userid,dataDict['id'])
         except:
             raise InvalidUsage('data send is not in correct format', status_code=400)
