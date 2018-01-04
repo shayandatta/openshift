@@ -98,10 +98,10 @@ def addUser(key):
         try:
             dataDict = json.loads(data)
             return manager.AddUser(key,dataDict['firebaseurl'],dataDict['firebasepwd'])
-        except:
-            raise InvalidUsage('data send is not in correct format', status_code=400)
+        except Exception as e:
+            raise InvalidUsage('data send is not in correct format :'+str(e), status_code=400)
     else:
-        raise InvalidUsage('data is not in correct format', status_code=406)
+        raise InvalidUsage('no data found', status_code=406)
 
 
 @app.route('/nimbus/v1/setcondition/<key>', methods = ['POST'])
