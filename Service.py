@@ -98,8 +98,8 @@ def addUser(key):
         try:
             dataDict = json.loads(data.decode('utf-8'))
             return manager.AddUser(key,dataDict['firebaseurl'],dataDict['firebasepwd'])
-        except Exception as e:
-            raise InvalidUsage('data send is not in correct format :'+str(e), status_code=400)
+        except:
+            raise InvalidUsage('data send is not in correct format', status_code=400)
     else:
         raise InvalidUsage('no data found', status_code=406)
 
