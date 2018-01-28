@@ -12,56 +12,48 @@ class UserDetails:
         self.subscribeFieldList=[]
 
 
-    def SetConditionList(self,indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage):
+    def SetConditionList(self,indice,attrnames,attrtypes,attrvalues,conjunctions,operations):
         conditionobj = Condition()
-        error = conditionobj.CreateCondition(indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage)
+        error = conditionobj.CreateCondition(indice,attrnames,attrtypes,attrvalues,conjunctions,operations)
         if len(error) > 0 :
             return error
 
         else:
             self.conditionList.append(conditionobj)
-            return conditionobj.id
+            return {'message':'Condition added successfully.','id':conditionobj.id}
 
     def RemoveFromConditionList(self,id):
         conditionobj = list(x for x in self.conditionList if x.id==id)
+        subscribeobj = list(x for x in self.subscribeFieldList if x.id==id)
+        if subscribeobj:
+            self.subscribeFieldList.remove(subscribeobj[0])
+            
         if conditionobj:
             self.conditionList.remove(conditionobj[0])
-            return 'Removed successfully'
+            return {'message':'Removed successfully'}
         else:
-            return 'Id not found'
+            return {'message':'Id not found'}
 
 
-    def GetConditionList(self):
-        return json.dumps(self.conditionList, default=lambda o: o.__dict__,sort_keys=True, indent=4)
-
-
-
-    def SetSubscibeFieldList(self,indice,subscribeFieldlist):
+    def SetSubscibeFieldList(self,conditionid,indice,subscribeFieldlist,triggermessage):
         subscibefieldobj = SubscibeField()
-        #print ('inside userdetails')
-        error = subscibefieldobj.CreateSubscribeFieldList(indice,subscribeFieldlist)
-     
+        error = subscibefieldobj.CreateSubscribeFieldList(conditionid,indice,subscribeFieldlist,triggermessage)
         if len(error) > 0 :
             return error
         else:
             self.subscribeFieldList.append(subscibefieldobj)
-            return subscibefieldobj.id
+            return {'message':'Fields subscribbed successfully.'}
 
 
     def RemoveFromSubscriptionList(self,id):
         subscribeobj = list(x for x in self.subscribeFieldList if x.id==id)
         if subscribeobj:
             self.subscribeFieldList.remove(subscribeobj[0])
-            return 'Removed successfully'
+            return {'message':'Removed successfully'}
         else:
-            return 'Id not found'
+            return {'message':'Id not found'}
 
-
-    def GetSubscibeFieldList(self):
-        return json.dumps(self.subscribeFieldList, default=lambda o: o.__dict__,sort_keys=True, indent=4)
-        
-
-        
+    
 
     
     

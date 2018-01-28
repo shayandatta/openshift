@@ -35,13 +35,10 @@ class ManagerLib(object):
 
 
     def GetListOfStocks(self,key,id):
-        try:
-            ret = self.GetUser(key,id)
-            if isinstance(ret, UserDetails):
-                ret = self.nse.get_stock_codes()
-            return json.dumps(ret,ensure_ascii=False, default=lambda o: o.__dict__,sort_keys=True, indent=4)
-        except Exception as e:
-            print (str(e))
+        ret = self.GetUser(key,id)
+        if isinstance(ret, UserDetails):
+            ret = self.nse.get_stock_codes()
+        return json.dumps(ret,ensure_ascii=False, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 
 
@@ -49,7 +46,8 @@ class ManagerLib(object):
         firebaseauth={'FIREBASE_URL':firebase_url,'FIREBASE_PWD':firebase_pass}
         userdetailobj = UserDetails(key,firebaseauth)
         self.userList.append(userdetailobj)
-        return userdetailobj.userid
+        ret = {'message':'User added successfully.','id':userdetailobj.userid}
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 
     def GetUsers(self):
@@ -62,9 +60,9 @@ class ManagerLib(object):
             if userobj[0].userkey == key:
                 return userobj[0]
             else:
-                return "Id-key mismatch"
+                return {'error':'Id-key mismatch'}
         else:
-            return "Id not found"
+            return {'error':'Id not found'}
 
         
 
@@ -74,20 +72,26 @@ class ManagerLib(object):
     
     
 
-    def AddConditionFieldList(self,key,id,indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage):
+    def AddConditionFieldList(self,key,id,indice,attrnames,attrtypes,attrvalues,conjunctions,operations):
         ret = self.GetUser(key,id)
         if isinstance(ret, UserDetails):
-            ret=ret.SetConditionList(indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage)
-        
+            ret = ret.SetConditionList(indice,attrnames,attrtypes,attrvalues,conjunctions,operations)
         return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
     
             
-    def AddSubscibeFieldList(self,key,id,stockname,subscribeFieldlist):
-        #print(subscribeFieldlist)
+    def AddSubscibeFieldList(self,key,id,conditionid,subscribeFieldlist,triggermessage):
         ret = self.GetUser(key,id)
         if isinstance(ret, UserDetails):
-            ret=ret.SetSubscibeFieldList(stockname,subscribeFieldlist)
+            conditionobjlist = list(condition for condition in ret.conditionList if condition.id == conditionid)
+            if conditionobjlist:
+                if not any(subscription for subscription in ret.subscribeFieldList if subscription.id == conditionid):
+                    ret=ret.SetSubscibeFieldList(conditionobjlist[0].id,conditionobjlist[0].indice,subscribeFieldlist,triggermessage)
+
+                else:
+                    ret = {'error':'Subscription for the condition already present.Remove and then try.'}
+            else:
+                ret = {'error':'Condition id not found.'}
         
         return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
     
@@ -97,19 +101,29 @@ class ManagerLib(object):
         ret = self.GetUser(key,id)
         if isinstance(ret, UserDetails):
             ret = ret.RemoveFromConditionList(conditionid)
-            return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)   
-        else:
-            return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)   
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)   
 
 
     def RemoveFromSubscriptionList(self,key,id,subscriptionid):
         ret = self.GetUser(key,id)
         if isinstance(ret, UserDetails):
             ret = ret.RemoveFromSubscriptionList(subscriptionid)
-            return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)   
-        else:
-            return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
-        return get_index_quote(stock)
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+
+
+    def GetConditionList(self,key,userid):
+        ret = self.GetUser(key,id)
+        if isinstance(ret, UserDetails):
+            ret = ret.conditionList
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+
+    def GetSubscriptionList(self,key,userid):
+        ret = self.GetUser(key,id)
+        if isinstance(ret, UserDetails):
+            ret = ret.subscribeFieldList
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 
 
@@ -117,9 +131,9 @@ class ManagerLib(object):
         ret = self.GetUser(key,id)
         if isinstance(ret, UserDetails):
             self.userList.remove(ret)
-            return "removed successfully"
-        else:
-            return ret
+            ret = {'message':'User removed successfully'}
+            
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
     
 
@@ -177,24 +191,4 @@ class ManagerLib(object):
 
     def RemoveStock(self,stock):
         if len(self.stocklist) > 0 and stock in self.stocklist:
-            self.stocklist.remove(stock)
-
-    def GetConditionList(self):
-        return json.dumps(self.conditionList, default=lambda o: o.__dict__,sort_keys=True, indent=4)
-
-
-        
-#print(ManagerLib().GetAllDetailsOfStock('ICICIBANK'))
-#CreateCondition(indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage):
-#manager = ManagerLib()
-#print(manager.userDetails.SetConditionList('ICICIBANK',['buyPrice1'],['number'],['256'],['AND'],['greater'],'hello'))
-#print(manager.userDetails.GetConditionList())
-#print (manager.userDetails.SetSubscibeFieldList('ICICIBANK',['buyPrice1']))
-#print (manager.userDetails.GetSubscibeFieldList())
-#print(manager.RemoveFromConditionList('45'))
-#print (manager.GetUserDetails(5))
-#id = manager.AddUser("SHAYAN")
-#print(manager.GetUserDetails("SHAYAN",id))
-#print(manager.AddConditionFieldList("SHAYAN",id,'ICICIBANK',['basePrice'],['number'],['256'],['AND'],['greater'],'hello'))
-#print(manager.AddSubscibeFieldList("SHAYAN",id,'ICICIBANK',['basePrice']))
-#print(manager.GetUserDetails("SHAYAN",id))
+            self.stocklist.remove(stock)        

@@ -6,28 +6,30 @@ class SubscibeField:
 
     error = []
         
-    def CreateSubscribeFieldList(self,indice,subscribeFieldlist):
-
-        error = SubscibeField.check(indice,subscribeFieldlist)
-        
+    def CreateSubscribeFieldList(self,conditionid,indice,subscribeFieldlist,triggermessage):
+        error = SubscibeField.check(indice,subscribeFieldlist,triggermessage)
         if len(error) == 0:
-            self.id =str(uuid.uuid4()).upper()
-            self.subscribeFieldList = subscribeFieldlist
+            self.id =conditionid
+            self.fieldlist = subscribeFieldlist
+            self.triggermessage = triggermessage
         return error
 
     
     @staticmethod
-    def check(indice,subscribeFieldlist):
+    def check(indice,subscribeFieldlist,triggermessage):
         
         utility = Utility()
         error = []
-        
+
+        if not triggermessage:
+            error.append({'error':'Message cannot be empty'})
+      
         if utility.CheckStockCode(indice) is False:
-            error.append('Wrong index code')
+            error.append({'error':'Wrong index code'})
 
         else:
             if not utility.CheckAttrNamesOfStock(indice,subscribeFieldlist):
-                error.append('field name doesnt exist')
+                error.append({'error':'Field name doesnot exist'})
 
         return error
             
@@ -37,10 +39,8 @@ class Condition:
 
     error = []
 
-    def CreateCondition(self,indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage):
-        #print ("inside metadata")
-        error = Condition.check(indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage)
-        #print ("inside metadata error "+str(error))
+    def CreateCondition(self,indice,attrnames,attrtypes,attrvalues,conjunctions,operations):
+        error = Condition.check(indice,attrnames,attrtypes,attrvalues,conjunctions,operations)
         if len(error) == 0:
 
             self.id = str(uuid.uuid4()).upper()
@@ -50,28 +50,26 @@ class Condition:
             self.attrvalues = [str(attrvalue) for attrvalue in attrvalues]
             self.conjunctions = conjunctions
             self.operations = operations
-            self.triggermessage = triggermessage
 
         return error
 
 
     @staticmethod
-    def check(indice,attrnames,attrtypes,attrvalues,conjunctions,operations,triggermessage):
+    def check(indice,attrnames,attrtypes,attrvalues,conjunctions,operations):
     
         utility = Utility()
         error = []
-
-        if not set(conjunctions).issubset(set(['AND','OR'])):
-            error.append('Conjuntion must be AND/OR')
         
-
+        if not set(conjunctions).issubset(set(['AND','OR'])):
+            error.append({'error':'Conjuntion must be AND/OR'})
+        
         if utility.CheckStockCode(indice) is False:
-            error.append('Wrong index code')
+            error.append({'error':'Wrong index code'})
 
         else:
             if not set(attrtypes).issubset(set(['string','date','number'])):
-                error.append('Type not in string/date/number')
-
+                error.append({'error':'Type not in string/date/number'})
+                
             else:
                 if utility.CheckAttrNamesOfStock(indice,attrnames):
 
@@ -79,19 +77,16 @@ class Condition:
     
                         #operation check
                         if  set(operations).issubset(set(['equals','greater','lesser'])) and all(utility.CheckOperation(attrtypes[i],operations[i]) for i in range(len(attrtypes))):
-
-                            if not triggermessage:
-
-                                error.append('Message cannot be empty')
-                        
+                            pass
+ 
                         else:
-                            error.append('Operation not in equals/greater/lesser.Note :String can have equals operation only')                     
+                            error.append({'error':'Operation not in equals/greater/lesser.Note :String can have equals operation only'})                     
 
                     else:
-                        error.append('Attribute type mismatch or value is null')
+                        error.append({'error':'Attribute type mismatch or value is null'})
 
                 else:
-                    error.append('Attribute name doesnot exist')
+                    error.append({'error':'Attribute name doesnot exist'})
 
 
         return error

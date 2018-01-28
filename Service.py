@@ -40,9 +40,9 @@ def getListOfStocks(key):
         try:
             return manager.GetListOfStocks(key,userid)
         except:
-            raise InvalidUsage('data not found', status_code=504)
+            raise InvalidUsage('Data not found', status_code=504)
     else:
-        raise InvalidUsage('userid is missing', status_code=406)
+        raise InvalidUsage('Userid is missing', status_code=406)
 
 
 @app.route('/nimbus/v1/checkstock/<key>/<indice>', methods = ['GET'])
@@ -65,9 +65,9 @@ def getLiveData(key,indice):
         try:
             return manager.GetLiveData(key,userid,indice)
         except:
-            raise InvalidUsage('data not found', status_code=504)
+            raise InvalidUsage('Data not found', status_code=504)
     else:
-        raise InvalidUsage('userid is missing', status_code=406)
+        raise InvalidUsage('Userid is missing', status_code=406)
 
 
 
@@ -75,9 +75,10 @@ def getLiveData(key,indice):
 def getUserDetails(key):
     userid = request.headers.get("userid")
     if userid is not None:
-        return manager.GetUserDetails(str(key),str(userid))
+        ret = manager.GetUserDetails(str(key),str(userid))
+        return ret
     else:
-        raise InvalidUsage('userid missing', status_code=406)
+        raise InvalidUsage('Userid missing', status_code=406)
 
 
 @app.route('/nimbus/v1/users', methods = ['GET'])
@@ -86,7 +87,7 @@ def getUsers():
     if authkey is not None and authkey=="ADMIN":
         return manager.GetUsers()
     else:
-        raise InvalidUsage('invalid authkey', status_code=401)
+        raise InvalidUsage('Invalid authkey', status_code=401)
 
 
 
@@ -100,9 +101,9 @@ def addUser(key):
             dataDict = dataDict['firebaseauth']
             return manager.AddUser(key,dataDict['FIREBASE_URL'],dataDict['FIREBASE_PWD'])
         except:
-            raise InvalidUsage('data send is not in correct format', status_code=400)
+            raise InvalidUsage('Data send is not in correct format', status_code=400)
     else:
-        raise InvalidUsage('no data found', status_code=406)
+        raise InvalidUsage('No data found', status_code=406)
 
 
 @app.route('/nimbus/v1/setcondition/<key>', methods = ['POST'])
@@ -113,11 +114,11 @@ def addConditionFieldList(key):
         try:
             dataDict = json.loads(data.decode('utf-8'))
             dataDict = dataDict['conditionList']
-            return manager.AddConditionFieldList(key,userid,dataDict['indice'],dataDict['attrnames'],dataDict['attrtypes'],dataDict['attrvalues'],dataDict['conjunctions'],dataDict['operations'],dataDict['triggermessage'])
+            return manager.AddConditionFieldList(key,userid,dataDict['indice'],dataDict['attrnames'],dataDict['attrtypes'],dataDict['attrvalues'],dataDict['conjunctions'],dataDict['operations'])
         except:
-            raise InvalidUsage('data send is not in correct format', status_code=400)
+            raise InvalidUsage('Data send is not in correct format', status_code=400)
     else:
-        raise InvalidUsage('userid or data is missing', status_code=406)
+        raise InvalidUsage('Userid or data is missing', status_code=406)
 
 
 
@@ -129,11 +130,11 @@ def addSubscibeFieldList(key):
         try:
             dataDict = json.loads(data.decode('utf-8'))
             dataDict = dataDict['subscribeFieldList']
-            return manager.AddSubscibeFieldList(key,userid,dataDict['indice'],dataDict['subscribefldlist'])
+            return manager.AddSubscibeFieldList(key,userid,dataDict['id'],dataDict['fieldlist'],dataDict['triggermessage'])
         except:
-            raise InvalidUsage('data send is not in correct format', status_code=400)
+            raise InvalidUsage('Data send is not in correct format', status_code=400)
     else:
-        raise InvalidUsage('userid or data is missing', status_code=406)
+        raise InvalidUsage('Userid or data is missing', status_code=406)
 
 
 
@@ -147,9 +148,9 @@ def delConditionFieldList(key):
             dataDict = dataDict['conditionList']
             return manager.RemoveFromConditionList(key,userid,dataDict['id'])
         except:
-            raise InvalidUsage('data send is not in correct format', status_code=400)
+            raise InvalidUsage('Data send is not in correct format', status_code=400)
     else:
-        raise InvalidUsage('userid or data is missing', status_code=406)
+        raise InvalidUsage('Userid or data is missing', status_code=406)
 
 
 
@@ -163,9 +164,9 @@ def delSubscibeFieldList(key):
             dataDict = dataDict['subscribeFieldList']
             return manager.RemoveFromSubscriptionList(key,userid,dataDict['id'])
         except:
-            raise InvalidUsage('data send is not in correct format', status_code=400)
+            raise InvalidUsage('Data send is not in correct format', status_code=400)
     else:
-        raise InvalidUsage('userid or data is missing', status_code=406)
+        raise InvalidUsage('Userid or data is missing', status_code=406)
 
 
 
@@ -175,9 +176,27 @@ def delUser(key):
     if userid is not None:
         return manager.RemoveUser(key,userid)
     else:
-        raise InvalidUsage('userid or data is missing', status_code=406)
+        raise InvalidUsage('Userid or data is missing', status_code=406)
 
 
+@app.route('/nimbus/v1/getconditionlist/<key>', methods = ['GET'])
+def getConditionList(key):
+    userid = request.headers.get("userid")
+    if userid is not None:
+        return manager.GetConditionList(key,userid)
+    else:
+        raise InvalidUsage('Userid or data is missing', status_code=406)
+
+
+@app.route('/nimbus/v1/getsubscriptionlist/<key>', methods = ['GET'])
+def getSubscriptionList(key):
+    userid = request.headers.get("userid")
+    if userid is not None:
+        return manager.GetSubscriptionList(key,userid)
+    else:
+        raise InvalidUsage('Userid or data is missing', status_code=406)
+
+    
 
 ###### Engine API's ######
     
