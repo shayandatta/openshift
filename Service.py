@@ -98,7 +98,6 @@ def addUser(key):
     if data is not None:
         try:
             dataDict = json.loads(data.decode('utf-8'))
-            dataDict = dataDict['firebaseauth']
             return manager.AddUser(key,dataDict['FIREBASE_URL'],dataDict['FIREBASE_PWD'])
         except:
             raise InvalidUsage('Data send is not in correct format', status_code=400)
@@ -113,7 +112,6 @@ def addConditionFieldList(key):
     if data and userid is not None:
         try:
             dataDict = json.loads(data.decode('utf-8'))
-            dataDict = dataDict['conditionList']
             return manager.AddConditionFieldList(key,userid,dataDict['indice'],dataDict['attrnames'],dataDict['attrtypes'],dataDict['attrvalues'],dataDict['conjunctions'],dataDict['operations'])
         except:
             raise InvalidUsage('Data send is not in correct format', status_code=400)
@@ -129,7 +127,6 @@ def addSubscibeFieldList(key):
     if data and userid is not None:
         try:
             dataDict = json.loads(data.decode('utf-8'))
-            dataDict = dataDict['subscribeFieldList']
             return manager.AddSubscibeFieldList(key,userid,dataDict['id'],dataDict['fieldlist'],dataDict['triggermessage'])
         except:
             raise InvalidUsage('Data send is not in correct format', status_code=400)
@@ -145,7 +142,6 @@ def delConditionFieldList(key):
     if data and userid is not None:
         try:
             dataDict = json.loads(data.decode('utf-8'))
-            dataDict = dataDict['conditionList']
             return manager.RemoveFromConditionList(key,userid,dataDict['id'])
         except:
             raise InvalidUsage('Data send is not in correct format', status_code=400)
@@ -161,7 +157,6 @@ def delSubscibeFieldList(key):
     if data and userid is not None:
         try:
             dataDict = json.loads(data.decode('utf-8'))
-            dataDict = dataDict['subscribeFieldList']
             return manager.RemoveFromSubscriptionList(key,userid,dataDict['id'])
         except:
             raise InvalidUsage('Data send is not in correct format', status_code=400)
@@ -213,8 +208,7 @@ def engineStatus():
 def engineRestart():
     authkey = request.headers.get("authkey")
     if authkey is not None and authkey=="ADMIN":
-        engine.EngineRestart()
-        return 'Engine Restarted'
+        return engine.EngineRestart()
     else:
         raise InvalidUsage('invalid authkey', status_code=401)
 
@@ -223,13 +217,11 @@ def engineRestart():
 def engineStop():
     authkey = request.headers.get("authkey")
     if authkey is not None and authkey=="ADMIN":
-        engine.EngineStop()
-        return 'Engine Stopped'
+        return engine.EngineStop()
     else:
         raise InvalidUsage('invalid authkey', status_code=401)
 
-
-        
+      
 
 if __name__=='__main__':
     app.run()

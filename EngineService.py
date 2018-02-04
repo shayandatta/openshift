@@ -1,4 +1,5 @@
 import time
+import json
 import threading
 from EngineManager import Engine
 
@@ -14,6 +15,7 @@ class EngineService:
     def EngineRestart(self):
         self.status = True
         threading.Thread(target = self.Run).start()
+        return json.dumps({'message':'Engine Restarted'}, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
    
     def Run(self):
@@ -34,12 +36,14 @@ class EngineService:
 
     def GetStatus(self):
         if self.status:
-           return "Running"
+            ret = {'message':'Engine Running'}
         else:
-            return "Stopped"
+            ret = {'message':'Engine Stopped'}
+        return json.dumps(ret, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 
     def EngineStop(self):
         self.status = False
+        return json.dumps({'message':'Engine Stopped'}, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
  
